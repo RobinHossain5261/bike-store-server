@@ -20,13 +20,18 @@ async function run() {
     try {
         const categoryCollection = client.db('bikeStore').collection('categoryOptions');
 
-
         app.get('/products', async (req, res) => {
             const query = {};
             const options = await categoryCollection.find(query).toArray();
             res.send(options)
         })
 
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const singleProducts = await categoryCollection.findOne(query);
+            res.send(singleProducts)
+        })
 
     }
     finally {
