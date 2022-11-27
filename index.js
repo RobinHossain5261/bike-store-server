@@ -4,9 +4,12 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
+//mideleware
+app.use(cors());
+app.use(express.json());
 
 app.get('/', async (req, res) => {
-    res.send('Bile-store server is running');
+    res.send('Bike-store server is running');
 })
 
 
