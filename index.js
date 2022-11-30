@@ -41,6 +41,7 @@ async function run() {
         const categoryCollection = client.db('bikeStore').collection('categoryOptions');
         const bookingsCollection = client.db('bikeStore').collection('bookings');
         const usersCollection = client.db('bikeStore').collection('users');
+        const productsCollection = client.db('bikeStore').collection('products');
 
         app.get('/products', async (req, res) => {
             const query = {};
@@ -136,6 +137,20 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // product category
+        app.get('/productCategory', async (req, res) => {
+            const query = {};
+            const result = await categoryCollection.find(query).project({ category: 1 }).toArray();
+            res.send(result);
+        })
+
+        //add product
+        app.post('/products', async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
             res.send(result);
         })
 
