@@ -43,6 +43,18 @@ async function run() {
         const usersCollection = client.db('bikeStore').collection('users');
         const productsCollection = client.db('bikeStore').collection('products');
 
+        const verifySeller = async (req, res, next) => {
+
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.role !== 'seller') {
+                return res.status(403).send({ message: 'Forbidden access' })
+            }
+            next();
+        }
+
         app.get('/products', async (req, res) => {
             const query = {};
             const options = await categoryCollection.find(query).toArray();
@@ -155,28 +167,27 @@ async function run() {
             res.send(result);
         })
 
-        //add product
-        app.post('/myproducts', async (req, res) => {
+        //add myproduct
+        app.post('/myproducts', verifyJWT, verifySeller, async (req, res) => {
             const product = req.body;
             const result = await productsCollection.insertOne(product);
             res.send(result);
         })
 
         //my products
-        app.get('/myproducts', async (req, res) => {
+        app.get('/myproducts', verifyJWT, verifySeller, async (req, res) => {
             const query = {};
             const products = await productsCollection.find(query).toArray();
             res.send(products)
         })
 
         //my product delete
-
-        // app.delete('/myproducts/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: ObjectId(id) };
-        //     const result = await productsCollection.deleteOne(query);
-        //     res.send(result);
-        // })
+        app.delete('/myproducts/:id', verifyJWT, verifySeller, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.send(result);
+        })
 
     }
     finally {
