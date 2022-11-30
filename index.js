@@ -103,6 +103,14 @@ async function run() {
             res.send({ isAdmin: user?.admin === 'admin' });
         })
 
+        //check seller
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isSeller: user?.role === 'seller' });
+        })
+
 
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -148,11 +156,27 @@ async function run() {
         })
 
         //add product
-        app.post('/products', async (req, res) => {
+        app.post('/myproducts', async (req, res) => {
             const product = req.body;
             const result = await productsCollection.insertOne(product);
             res.send(result);
         })
+
+        //my products
+        app.get('/myproducts', async (req, res) => {
+            const query = {};
+            const products = await productsCollection.find(query).toArray();
+            res.send(products)
+        })
+
+        //my product delete
+
+        // app.delete('/myproducts/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) };
+        //     const result = await productsCollection.deleteOne(query);
+        //     res.send(result);
+        // })
 
     }
     finally {
